@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pi Health AI</title>
+    <style>
+        :root {
+            --pi-purple: #6236FF;
+            --pi-gold: #FFD700;
+            --bg-light: #F9F9FB;
+            --text-dark: #2D2D2D;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg-light); color: var(--text-dark); display: flex; justify-content: center; padding: 10px; }
+        .app-container { width: 100%; max-width: 450px; background: white; border-radius: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.05); overflow: hidden; padding-bottom: 20px; }
+        .header { background: var(--pi-purple); color: white; padding: 20px; text-align: center; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; }
+        .header h1 { font-size: 22px; color: var(--pi-gold); margin-bottom: 5px; }
+        .header p { font-size: 13px; opacity: 0.9; }
+        .section { padding: 15px; margin: 15px; background: #FFF; border: 1px solid #EAEAEA; border-radius: 15px; }
+        .section-title { font-size: 15px; font-weight: bold; margin-bottom: 12px; display: flex; align-items: center; gap: 5px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center; }
+        .stat-card { background: #F4F6F9; padding: 10px 5px; border-radius: 10px; font-size: 12px; line-height: 1.4; }
+        .stat-card div { font-weight: bold; font-size: 14px; color: var(--pi-purple); margin-top: 5px; }
+        .btn { display: block; width: 100%; background: var(--pi-purple); color: white; border: none; padding: 12px; font-size: 14px; font-weight: bold; border-radius: 10px; cursor: pointer; text-align: center; transition: 0.2s; }
+        .btn:hover { opacity: 0.9; }
+        .btn-gold { background: var(--pi-gold); color: var(--text-dark); margin-top: 10px; }
+        .ai-box { border-left: 4px solid #FF3B30; padding-left: 10px; margin-bottom: 10px; }
+        .ai-title { font-size: 13px; font-weight: bold; color: #FF3B30; }
+        .list-item { font-size: 13px; margin: 5px 0 5px 15px; }
+        .footer { font-size: 11px; text-align: center; color: #888; padding: 0 20px; margin-top: 15px; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Header -->
+    <div class="header">
+        <h1>🩺 Pi Health AI</h1>
+        <p>Kết nối Smartwatch – Quét Full Bệnh – Nhận Pi Thưởng!</p>
+    </div>
+
+    <!-- Màn hình 1: Chỉ số sinh tồn -->
+    <div class="section">
+        <div class="section-title">📊 Chỉ số từ Thiết bị đeo</div>
+        <div class="stats-grid">
+            <div class="stat-card">❤️<br>Tim mạch<div>-- bpm</div></div>
+            <div class="stat-card">🩸<br>Huyết áp<div>-- mmHg</div></div>
+            <div class="stat-card">💤<br>Giấc ngủ<div>-- giờ</div></div>
+        </div>
+        <button class="btn btn-gold" style="margin-top: 12px;" onclick="requestAiConsultation()">🚀 Khám Bệnh Với AI Ngay (0.1 Pi)</button>
+    </div>
+
+    <!-- Màn hình 2: Kết quả từ AI -->
+    <div class="section">
+        <div class="section-title">🤖 Kết quả phân tích từ AI</div>
+        <div class="ai-box">
+            <div class="ai-title">⚠️ Sàng lọc sớm (Độ tin cậy: 87%)</div>
+        </div>
+        
+        <div style="font-size: 13px; font-weight: bold; margin-top: 10px;">3 Chẩn đoán phân biệt:</div>
+        <div class="list-item">• [Bệnh lý dự đoán 1]</div>
+        <div class="list-item">• [Bệnh lý dự đoán 2]</div>
+        <div class="list-item">• [Bệnh lý dự đoán 3]</div>
+
+        <div style="font-size: 13px; font-weight: bold; margin-top: 10px;">3 Lời khuyên xử lý:</div>
+        <div class="list-item">• [Nghỉ ngơi tại chỗ thoáng mát]</div>
+        <div class="list-item">• [Theo dõi lại chỉ số sau 15 phút]</div>
+        <div class="list-item">• [Khám bác sĩ chuyên khoa nếu không giảm]</div>
+    </div>
+
+    <!-- Màn hình 3: Lan truyền Viral -->
+    <div class="section" style="background: #FDF9E2; border-color: var(--pi-gold);">
+        <div class="section-title">🎁 Chia sẻ ngay - Nhận Pi liền tay!</div>
+        <p style="font-size: 13px; margin-bottom: 10px;">Mời 1 Pioneer khám bệnh = Nhận ngay 0.05 Pi. Bạn bè của bạn sẽ được Miễn Phí lượt khám đầu tiên!</p>
+        <button class="btn" onclick="copyInviteLink()">🔗 Sao Chép Link Mời</button>
+    </div>
+
+    <!-- Chân trang bắt buộc -->
+    <div class="footer">
+        * Đối chiếu chỉ số với nhãn mác thiết bị gốc. AI chỉ mang tính chất tham khảo thông tin, hoàn toàn không thay thế cho chẩn đoán và quyết định chuyên môn của bác sĩ y khoa.<br><br>
+        <span style="font-style: italic; opacity: 0.8;">This is for informational purposes only. For medical advice or diagnosis, consult a professional. AI responses may include mistakes.</span>
+    </div>
+</div>
+
+<script src="https://minepi.com"></script>
+<script>
+    Pi.init({ version: "2.0", sandbox: true });
+
+    async function authPiUser() {
+        try {
+            const scopes = ['username', 'payments'];
+            await Pi.authenticate(scopes, onIncompletePaymentFound);
+        } catch (error) {
+            console.error("Lỗi xác thực ví Pi:", error);
+        }
+    }
+
+    window.onload = function() {
+        authPiUser();
+    };
+
+    async function requestAiConsultation() {
+        try {
+            const paymentData = {
+                amount: 0.1,
+                memo: "Phí dịch vụ chẩn đoán y tế AI toàn diện",
+                metadata: { service: "ai_triage_consultation" }
+            };
+
+            const callbacks = {
+                onReadyForServerApproval: function(paymentId) {
+                    console.log("Đang chờ duyệt lệnh:", paymentId);
+                },
+                onReadyForServerCompletion: function(paymentId, txid) {
+                    alert("Thanh toán thành công 0.1 Pi! Hệ thống AI bắt đầu kết nối thiết bị và quét bệnh.");
+                },
+                onCancel: function(paymentId) {
+                    alert("Bạn đã hủy lệnh thanh toán.");
+                },
+                onError: function(error, paymentId) {
+                    alert("Lỗi cổng kết nối ví Pi.");
+                }
+            };
+
+            await Pi.createPayment(paymentData, callbacks);
+
+        } catch (error) {
+            console.error("Lỗi khởi tạo thanh toán:", error);
+        }
+    }
+
+    function copyInviteLink() {
+        navigator.clipboard.writeText(window.location.href);
+        alert("Đã sao chép liên kết mời thành công!");
+    }
+
+    function onIncompletePaymentFound(payment) {
+        console.log("Giao dịch chưa hoàn tất:", payment.identifier);
+    }
+</script>
+</body>
+</html>
