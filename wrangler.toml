@@ -1,4 +1,4 @@
-name = "health-si-api"
+name = "pi-health-ai"
 main = "worker.js"
 compatibility_date = "2026-11-21"
 
