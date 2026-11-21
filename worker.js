@@ -110,7 +110,8 @@ export default {
     try {
       const data = await env.AI.run(env.AI_MODEL, {
         temperature: 0.2,
-        max_completion_tokens: 400,
+        max_completion_tokens: 600,
+        chat_template_kwargs: { enable_thinking: false },
         store: false,
         messages: [{ role: "system", content: system + knowledgeContext }, { role: "user", content: question }]
       });
