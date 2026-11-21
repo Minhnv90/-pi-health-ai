@@ -51,3 +51,7 @@ The frontend prototype is not yet wired to this API. After deployment, configure
 ## Pi identity verification
 
 The Pi login button sends the Pi SDK access token to this app's Worker at `POST /api/pi/verify`. The Worker validates it with the official Pi Platform API `GET https://api.minepi.com/v2/me` and returns only the verified Pioneer UID and username. The access token is not saved in browser localStorage. Enter the deployed Worker URL in this app's API URL field before signing in. Pi documentation describes the verified UID as an identifier for a Pioneer within an app, so do not assume the UID is identical across two separately registered Pi apps. A true shared account needs a central account-linking service: the user must authenticate in both apps, both tokens must be verified server-side, and the linkage must be stored only after explicit user consent. A persistent shared member database/session, reward ledger, and Pi payment/payout flows still need to be built and configured.
+
+## Knowledge engine
+
+See [`KNOWLEDGE_ENGINE.md`](./KNOWLEDGE_ENGINE.md) for the separate Cloudflare D1 schema, migration, admin ingestion API, approved-record search, and deployment instructions. The D1 binding and `KNOWLEDGE_ADMIN_TOKEN` must be configured before knowledge retrieval or ingestion will work.
