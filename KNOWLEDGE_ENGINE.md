@@ -86,3 +86,20 @@ The AI assist endpoint automatically retrieves up to five approved matching reco
 - Source URLs and claims still require human verification. A record being stored does not make it medically authoritative.
 - Worker code does not persist user prompts, but the configured upstream AI provider and Cloudflare infrastructure may have their own retention policies.
 - Add rate limiting, admin audit logs, stronger role separation and a formal clinical review process before public production.
+
+
+## Admin page and AI provider secrets
+
+After GitHub Pages publishes this repository, open the private-session admin page: https://minhnv90.github.io/-pi-health-ai/knowledge-admin.html
+
+To activate the AI answer endpoint, set the provider details as Worker secrets (not in GitHub or the browser):
+
+```bash
+npx wrangler secret put AI_CHAT_COMPLETIONS_URL
+npx wrangler secret put AI_API_KEY
+npx wrangler secret put AI_MODEL
+```
+
+Enter the provider's HTTPS chat-completions endpoint, API key, and exact model identifier when Wrangler prompts. Do this only after the Worker is deployed/linked to the correct Cloudflare account and before testing AI questions. Use a provider account and model you control. The API key is never needed by the frontend or admin page.
+
+The admin page URL above is publicly reachable as a static page; the write API still requires the secret admin token. Keep that token private and use the page only on a trusted device.
