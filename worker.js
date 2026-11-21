@@ -89,7 +89,7 @@ export default {
       return Response.json({ error: "Not found" }, { status: 404, headers });
     }
     if (!env.AI_CHAT_COMPLETIONS_URL || !env.AI_API_KEY || !env.AI_MODEL) {
-      return Response.json({ error: "AI service is not configured." }, { status: 503, headers });
+      return Response.json({ error: "AI service is not configured. Missing: " + ["AI_CHAT_COMPLETIONS_URL", "AI_API_KEY", "AI_MODEL"].filter(key => !env[key]).join(", "), code: "AI_CONFIG_MISSING" }, { status: 503, headers });
     }
     let body;
     try { body = await request.json(); } catch {
