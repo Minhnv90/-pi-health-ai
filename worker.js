@@ -49,6 +49,12 @@ async function handleKnowledge(request, env, headers, url) {
     const approval = safeText(record.approval_status || "draft", 30);
     if (!id || !title || !content) return Response.json({ error: "id, title and body are required." }, { status: 400, headers });
     if (!APPROVAL_STATES.includes(approval)) return Response.json({ error: "Invalid approval_status." }, { status: 400, headers });
+    if (approval === "approved") {
+      const sourceUrl = safeText(record.source_url, 1000);
+      if (!safeText(record.source_title, 300) || !safeText(record.source_organization, 300) || !/^https:\/\//i.test(sourceUrl) || !safeText(record.reviewer, 200)) {
+        return Response.json({ error: "Approved health records require source_title, source_organization, an HTTPS source_url, and reviewer." }, { status: 400, headers });
+      }
+    }
     const values = KNOWLEDGE_FIELDS.map(field => field === "approval_status" ? approval : safeText(record[field], field === "body" ? 20000 : 4000));
     const placeholders = KNOWLEDGE_FIELDS.map(() => "?").join(",");
     const updates = KNOWLEDGE_FIELDS.filter(field => field !== "id").map(field => field + "=excluded." + field).join(",");
