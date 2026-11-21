@@ -1,182 +1,33 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pi Health AI</title>
-    <style>
-        :root {
-            --pi-purple: #6236FF;
-            --pi-gold: #FFD700;
-            --bg-light: #F9F9FB;
-            --text-dark: #2D2D2D;
-            --gray-light: #F4F6F9;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: var(--bg-light); color: var(--text-dark); display: flex; justify-content: center; padding: 10px; }
-        .app-container { width: 100%; max-width: 450px; background: white; border-radius: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.05); overflow: hidden; padding-bottom: 20px; }
-        .header { background: var(--pi-purple); color: white; padding: 20px; text-align: center; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; }
-        .header h1 { font-size: 22px; color: var(--pi-gold); margin-bottom: 5px; }
-        .header p { font-size: 13px; opacity: 0.9; }
-        .section { padding: 15px; margin: 15px; background: #FFF; border: 1px solid #EAEAEA; border-radius: 15px; }
-        .section-title { font-size: 15px; font-weight: bold; margin-bottom: 12px; display: flex; align-items: center; gap: 5px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center; }
-        .stat-card { background: var(--gray-light); padding: 12px 5px; border-radius: 10px; font-size: 12px; line-height: 1.4; transition: 0.3s; }
-        .stat-card div { font-weight: bold; font-size: 14px; color: var(--pi-purple); margin-top: 5px; }
-        .btn { display: block; width: 100%; background: var(--pi-purple); color: white; border: none; padding: 12px; font-size: 14px; font-weight: bold; border-radius: 10px; cursor: pointer; text-align: center; transition: 0.2s; }
-        .btn:hover { opacity: 0.9; }
-        .btn:disabled { background: #ccc; cursor: not-allowed; }
-        .btn-gold { background: var(--pi-gold); color: var(--text-dark); margin-top: 10px; }
-        .ai-box { border-left: 4px solid #FF3B30; padding-left: 10px; margin-bottom: 10px; }
-        .ai-title { font-size: 13px; font-weight: bold; color: #FF3B30; }
-        .list-item { font-size: 13px; margin: 6px 0 6px 15px; color: #444; }
-        .footer { font-size: 11px; text-align: center; color: #888; padding: 0 20px; margin-top: 15px; line-height: 1.4; }
-        .loading { font-style: italic; color: #888; font-size: 13px; }
-    </style>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#123b35"><meta name="description" content="Health SI - trợ lý thông tin và chăm sóc sức khỏe cá nhân.">
+<title>Health SI | Pi Network</title>
+<style>
+:root{color-scheme:light;--ink:#173b35;--muted:#60736e;--brand:#176b58;--mint:#e9f5ef;--line:#dce8e2;--paper:#f6faf7}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{max-width:760px;margin:auto;padding:18px}.hero{padding:26px;border-radius:24px;background:linear-gradient(135deg,#123b35,#23866b);color:white}.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:.8}.hero h1{font-size:34px;margin:6px 0}.hero p{margin:0;max-width:540px;color:#e1f4eb}.pill{display:inline-block;margin-top:16px;padding:6px 11px;border:1px solid #ffffff55;border-radius:99px;font-size:12px}.card{background:white;border:1px solid var(--line);border-radius:18px;padding:20px;margin-top:16px;box-shadow:0 8px 28px #173b3509}.card h2{font-size:19px;margin:0 0 8px}.muted{color:var(--muted);font-size:14px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}.field{display:grid;gap:5px;margin:12px 0}.field label{font-size:14px;font-weight:650}.field input,.field textarea,.field select{width:100%;padding:12px;border:1px solid var(--line);border-radius:11px;font:inherit;background:white;color:var(--ink)}button{border:0;border-radius:12px;padding:12px 16px;background:var(--brand);color:white;font:inherit;font-weight:650;cursor:pointer}button.secondary{background:var(--mint);color:var(--ink)}button:disabled{opacity:.55;cursor:not-allowed}.actions{display:flex;gap:10px;flex-wrap:wrap}.notice{padding:12px;border-radius:12px;background:#fff7df;color:#66501b;font-size:13px}.result{white-space:pre-wrap;background:var(--mint);padding:14px;border-radius:12px;min-height:48px}.status{font-size:13px;color:var(--muted);margin-top:8px}footer{padding:22px 4px;color:var(--muted);font-size:12px}a{color:var(--brand)}@media(max-width:480px){.wrap{padding:12px}.hero{padding:22px}.hero h1{font-size:29px}}
+</style>
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
 </head>
-<body>
-
-<div class="app-container">
-    <!-- Header -->
-    <div class="header">
-        <h1>🩺 Pi Health AI</h1>
-        <p>Kết nối Smartwatch – Quét Full Bệnh – Nhận Pi Thưởng!</p>
-    </div>
-
-    <!-- Màn hình 1: Chỉ số sinh tồn -->
-    <div class="section">
-        <div class="section-title">📊 Chỉ số từ Thiết bị đeo</div>
-        <div class="stats-grid">
-            <div class="stat-card">❤️<br>Tim mạch<div id="heartRate">-- bpm</div></div>
-            <div class="stat-card">🩸<br>Huyết áp<div id="bloodPressure">-- mmHg</div></div>
-            <div class="stat-card">💤<br>Giấc ngủ<div id="sleepTime">-- giờ</div></div>
-        </div>
-        <button id="scanBtn" class="btn btn-gold" style="margin-top: 12px;" onclick="requestAiConsultation()">🚀 Khám Bệnh Với AI Ngay (0.1 Pi)</button>
-    </div>
-
-    <!-- Màn hình 2: Kết quả từ AI -->
-    <div class="section">
-        <div class="section-title">🤖 Kết quả phân tích từ AI</div>
-        
-        <div id="aiOutputPlaceholder" class="loading">Vui lòng hoàn tất thanh toán để nhận kết quả phân tích y tế tự động từ AI.</div>
-        
-        <div id="aiResultContent" style="display: none;">
-            <div class="ai-box">
-                <div id="aiConfidence" class="ai-title">⚠️ Sàng lọc sớm (Độ tin cậy: --%)</div>
-            </div>
-            
-            <div style="font-size: 13px; font-weight: bold; margin-top: 10px;">3 Khả năng bệnh lý (Chẩn đoán phân biệt):</div>
-            <div id="diag1" class="list-item">• </div>
-            <div id="diag2" class="list-item">• </div>
-            <div id="diag3" class="list-item">• </div>
-
-            <div style="font-size: 13px; font-weight: bold; margin-top: 10px;">3 Giải pháp xử lý khuyến cáo:</div>
-            <div id="adv1" class="list-item">• </div>
-            <div id="adv2" class="list-item">• </div>
-            <div id="adv3" class="list-item">• </div>
-        </div>
-    </div>
-
-    <!-- Màn hình 3: Viral -->
-    <div class="section" style="background: #FDF9E2; border-color: var(--pi-gold);">
-        <div class="section-title">🎁 Chia sẻ ngay - Nhận Pi liền tay!</div>
-        <p style="font-size: 13px; margin-bottom: 10px;">Mời 1 Pioneer khám bệnh = Nhận ngay 0.05 Pi. Bạn bè của bạn sẽ được Miễn Phí lượt khám đầu tiên!</p>
-        <button class="btn" onclick="copyInviteLink()">🔗 Sao Chép Link Mời</button>
-    </div>
-
-    <!-- Chân trang bắt buộc -->
-    <div class="footer">
-        * Hãy đối chiếu thông tin với nhãn mác thiết bị gốc hoặc hướng dẫn sử dụng đi kèm để xác minh tính chính xác của chỉ số. Hệ thống AI chỉ cung cấp thông tin mang tính chất tham khảo, hoàn toàn không thay thế cho chẩn đoán chuyên môn, hướng dẫn điều trị hoặc quyết định chuyên khoa của bác sĩ y khoa.<br><br>
-        <span style="font-style: italic; opacity: 0.8;">This is for informational purposes only. For medical advice or diagnosis, consult a professional. AI responses may include mistakes.</span>
-    </div>
-</div>
-
-<!-- Pi Network SDK -->
-<script src="https://minepi.com"></script>
+<body><main class="wrap">
+<header class="hero"><div class="eyebrow">Personal wellbeing intelligence</div><h1>Health SI</h1><p>Trợ lý thông tin sức khỏe, nhật ký thói quen và chuẩn bị trao đổi với chuyên gia y tế.</p><span class="pill">Pi Browser ready · Prototype</span></header>
+<section class="card"><h2>Đăng nhập Pi</h2><p class="muted">Kết nối tài khoản Pi để nhận diện người dùng. Bản thử nghiệm chưa thực hiện thanh toán.</p><div class="actions"><button id="piLogin">Đăng nhập bằng Pi</button><button class="secondary" id="piLogout">Xóa phiên hiển thị</button></div><div id="piStatus" class="status" role="status">Chưa kết nối.</div></section>
+<section class="card"><h2>Nhật ký sức khỏe</h2><p class="muted">Nhập dữ liệu do bạn tự đo hoặc lấy từ thiết bị. Ứng dụng không tự tạo chỉ số giả.</p>
+<div class="grid"><div class="field"><label for="pulse">Nhịp tim (bpm)</label><input id="pulse" type="number" min="20" max="250" placeholder="Ví dụ: 72"></div><div class="field"><label for="sleep">Thời lượng ngủ (giờ)</label><input id="sleep" type="number" min="0" max="24" step=".1" placeholder="Ví dụ: 7.5"></div><div class="field"><label for="sys">Huyết áp tâm thu (mmHg)</label><input id="sys" type="number" min="50" max="300" placeholder="Ví dụ: 120"></div><div class="field"><label for="dia">Huyết áp tâm trương (mmHg)</label><input id="dia" type="number" min="30" max="200" placeholder="Ví dụ: 80"></div></div>
+<div class="field"><label for="notes">Ghi chú / triệu chứng (không bắt buộc)</label><textarea id="notes" rows="3" placeholder="Mô tả điều bạn muốn ghi nhớ..."></textarea></div><div class="actions"><button id="saveLog">Lưu nhật ký trên thiết bị</button><button class="secondary" id="clearLog">Xóa nhật ký trên thiết bị</button></div><p id="logStatus" class="status">Dữ liệu chỉ lưu trong trình duyệt này; chưa gửi lên máy chủ.</p></section>
+<section class="card"><h2>Tóm tắt để trao đổi với bác sĩ</h2><p class="muted">Tạo bản tóm tắt từ những gì bạn đã nhập, không phải chẩn đoán.</p><div class="actions"><button id="summaryBtn">Tạo tóm tắt</button><button class="secondary" id="copySummary">Sao chép</button></div><div id="summary" class="result" aria-live="polite">Chưa có tóm tắt.</div></section>
+<section class="card"><h2>Định hướng phát triển</h2><ul><li>Kết nối dữ liệu Apple Health / thiết bị đeo qua API có cấp quyền.</li><li>AI giải thích thông tin sức khỏe có trích dẫn nguồn y khoa.</li><li>Đồng bộ dữ liệu mã hóa và quản lý quyền truy cập.</li><li>Tích hợp thanh toán Pi chỉ sau khi có backend xác thực giao dịch.</li></ul><div class="notice">Không nhập thông tin định danh nhạy cảm hoặc hồ sơ bệnh án thật vào bản prototype này.</div></section>
+<footer>Health SI là công cụ ghi chép và cung cấp thông tin tham khảo, không phải thiết bị y tế, không chẩn đoán hoặc điều trị. Khi có dấu hiệu cấp cứu, hãy liên hệ dịch vụ cấp cứu tại địa phương. Không dùng ứng dụng để trì hoãn chăm sóc y tế.</footer>
+</main>
 <script>
-    // Cấu hình SDK môi trường Sandbox để thử nghiệm
-    Pi.init({ version: "2.0", sandbox: true });
-
-    async function authPiUser() {
-        try {
-            const scopes = ['username', 'payments'];
-            const authResult = await Pi.authenticate(scopes, onIncompletePaymentFound);
-            console.log("Xác thực Pioneer thành công:", authResult.user.username);
-        } catch (error) {
-            console.error("Lỗi xác thực ví Pi:", error);
-        }
-    }
-
-    window.onload = function() {
-        authPiUser();
-    };
-
-    // Hàm gọi Cổng thanh toán Pi Network
-    async function requestAiConsultation() {
-        const scanBtn = document.getElementById('scanBtn');
-        scanBtn.disabled = true;
-        scanBtn.innerText = "⏳ Đang kết nối ví...";
-
-        try {
-            const paymentData = {
-                amount: 0.1,
-                memo: "Phí dịch vụ chẩn đoán sức khỏe thông minh bằng trí tuệ nhân tạo AI",
-                metadata: { service: "health_ai_triage" }
-            };
-
-            const callbacks = {
-                onReadyForServerApproval: function(paymentId) {
-                    console.log("Giao dịch đang chờ Server của bạn Approve:", paymentId);
-                    // Tại đây, bạn cần gửi paymentId về Backend Server của mình để POST lên API Pi Network phê duyệt
-                },
-                onReadyForServerCompletion: function(paymentId, txid) {
-                    console.log("Giao dịch đã hoàn tất trên blockchain. TxID:", txid);
-                    executeMedicalDataSimulation();
-                },
-                onCancel: function(paymentId) {
-                    alert("Bạn đã hủy lệnh giao dịch.");
-                    resetScanButton();
-                },
-                onError: function(error, paymentId) {
-                    alert("Lỗi kết nối cổng thanh toán Pi. Vui lòng thử lại.");
-                    resetScanButton();
-                }
-            };
-
-            await Pi.createPayment(paymentData, callbacks);
-
-        } catch (error) {
-            console.error("Lỗi xử lý luồng thanh toán:", error);
-            resetScanButton();
-        }
-    }
-
-    // Giả lập nhận dữ liệu từ Smartwatch và chạy AI sau khi thanh toán thành công
-    function executeMedicalDataSimulation() {
-        document.getElementById('scanBtn').innerText = "✅ Đang phân tích dữ liệu...";
-        
-        // 1. Cập nhật chỉ số sinh tồn ngẫu nhiên giả định
-        const hr = Math.floor(Math.random() * (110 - 85 + 1)) + 85; // Nhịp tim nhanh nhẹ (85-110 bpm)
-        const bpSystolic = Math.floor(Math.random() * (145 - 130 + 1)) + 130; // Huyết áp tâm thu hơi cao
-        const bpDiastolic = Math.floor(Math.random() * (95 - 80 + 1)) + 80;
-        const sleep = (Math.random() * (5.5 - 4.0) + 4.0).toFixed(1); // Thiếu ngủ
-
-        document.getElementById('heartRate').innerText = `${hr} bpm`;
-        document.getElementById('bloodPressure').innerText = `${bpSystolic}/${bpDiastolic} mmHg`;
-        document.getElementById('sleepTime').innerText = `${sleep} giờ`;
-
-        // 2. Mô phỏng thuật toán AI phân tích để xuất chẩn đoán phân biệt (Cần tối thiểu 3 khả năng và 3 giải pháp)
-        setTimeout(() => {
-            document.getElementById('aiOutputPlaceholder').style.display = 'none';
-            document.getElementById('aiResultContent').style.display = 'block';
-            
-            document.getElementById('piConfidence').innerText = "⚠️ Sàng lọc sớm (Độ tin cậy: 89%)";
-            
-            // Cung cấp bắt buộc tối thiểu 3 khả năng bệnh lý tiềm ẩn
-            document.getElementById('diag1').innerText = "• Tăng huyết áp độ 1 phản ứng (Theo dõi stress/thiếu ngủ)";
-            document.getElementById('diag2').innerText = "• Nhịp tim nhanh xoang do rối loạn thần kinh thực vật";
-            document.getElementById('diag3').innerText = "• Hội chứng mệt mỏi mạn tính (Chronic Fatigue Syndrome)";
-
-            // Cung cấp bắt buộc tối thiểu 3 giải pháp xử lý ban đầu
-            document.getElementById('adv1').innerText = "• Nghỉ ngơi tại chỗ thoáng mát, tránh thay đổi tư thế đột ngột";
-            document.getElementById('adv2').innerText = "• Đo lại chỉ số huyết áp và nhịp tim thủ công sau 15-30 phút nghỉ ngơi";
+const $=id=>document.getElementById(id);let piUser=null;let saved=null;
+function setStatus(id,msg){$(id).textContent=msg}
+if(window.Pi){try{Pi.init({version:"2.0",sandbox:true})}catch(e){setStatus("piStatus","Không khởi tạo được Pi SDK: "+e.message)}}else{setStatus("piStatus","Không tìm thấy Pi SDK. Hãy mở ứng dụng trong Pi Browser.")}
+$("piLogin").addEventListener("click",async()=>{if(!window.Pi){setStatus("piStatus","Pi SDK chưa sẵn sàng.");return}try{const auth=await Pi.authenticate(["username"]);piUser=auth.user;setStatus("piStatus","Đã đăng nhập: @"+piUser.username+" (chỉ hiển thị tên người dùng).")}catch(e){setStatus("piStatus","Đăng nhập thất bại: "+(e.message||e))}});
+$("piLogout").addEventListener("click",()=>{piUser=null;setStatus("piStatus","Đã xóa tên người dùng khỏi giao diện. Để thu hồi quyền ứng dụng, hãy quản lý trong Pi Wallet.")});
+$("saveLog").addEventListener("click",()=>{const data={pulse:$("pulse").value,sleep:$("sleep").value,sys:$("sys").value,dia:$("dia").value,notes:$("notes").value,updatedAt:new Date().toISOString()};try{localStorage.setItem("health-si-log",JSON.stringify(data));saved=data;setStatus("logStatus","Đã lưu trên thiết bị này lúc "+new Date().toLocaleString("vi-VN")+".")}catch(e){setStatus("logStatus","Không thể lưu trên thiết bị.")}});
+$("clearLog").addEventListener("click",()=>{localStorage.removeItem("health-si-log");saved=null;["pulse","sleep","sys","dia","notes"].forEach(id=>$(id).value="");$("summary").textContent="Chưa có tóm tắt.";setStatus("logStatus","Đã xóa dữ liệu cục bộ.")});
+$("summaryBtn").addEventListener("click",()=>{const d=saved||{pulse:$("pulse").value,sleep:$("sleep").value,sys:$("sys").value,dia:$("dia").value,notes:$("notes").value};const lines=["TÓM TẮT DO NGƯỜI DÙNG NHẬP", "Thời điểm: "+new Date().toLocaleString("vi-VN"),"Nhịp tim: "+(d.pulse||"Chưa nhập")+" bpm","Giấc ngủ: "+(d.sleep||"Chưa nhập")+" giờ","Huyết áp: "+(d.sys&&d.dia?d.sys+"/"+d.dia:"Chưa nhập")+" mmHg","Ghi chú: "+(d.notes||"Không có"),"Lưu ý: số liệu tự khai báo, cần đối chiếu thiết bị và trao đổi với chuyên gia y tế."];$("summary").textContent=lines.join("\n")});
+$("copySummary").addEventListener("click",async()=>{try{await navigator.clipboard.writeText($("summary").textContent);setStatus("logStatus","Đã sao chép tóm tắt.")}catch(e){setStatus("logStatus","Không thể sao chép tự động trên trình duyệt này.")}});
+try{const raw=localStorage.getItem("health-si-log");if(raw){saved=JSON.parse(raw);for(const id of ["pulse","sleep","sys","dia","notes"])$(id).value=saved[id]||"";setStatus("logStatus","Đã tải nhật ký lưu trên thiết bị.")}}catch(e){}
+</script></body></html>
