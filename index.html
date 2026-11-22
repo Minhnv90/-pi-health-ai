@@ -11,8 +11,19 @@
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 </head>
 <body><main class="wrap">
-<header class="hero"><div class="eyebrow">Sức khỏe cá nhân</div><h1>Health SI</h1><p>Tìm hiểu vấn đề sức khỏe thường gặp, sắp xếp triệu chứng và chuẩn bị câu hỏi để trao đổi với bác sĩ.</p><span class="pill">Bản thử nghiệm · Không chẩn đoán</span><nav class="actions" aria-label="Đi nhanh trong Health SI"><a href="#health-ai">Hỏi AI</a> · <a href="#health-diary">Nhật ký</a> · <a href="#urgent-help">Dấu hiệu cấp cứu</a></nav></header>
+<header class="hero"><div class="eyebrow">Sức khỏe cá nhân</div><h1>Health SI</h1><p>Tìm hiểu vấn đề sức khỏe thường gặp, sắp xếp triệu chứng và chuẩn bị câu hỏi để trao đổi với bác sĩ.</p><span class="pill">Bản thử nghiệm · Không chẩn đoán</span><nav class="actions" aria-label="Đi nhanh trong Health SI"><a href="#health-ai">Hỏi AI</a> · <a href="#health-diary">Nhật ký</a> · <a href="#checklist-di-kham">Checklist đi khám</a> · <a href="#urgent-help">Dấu hiệu cấp cứu</a></nav></header>
 <section class="card" aria-labelledby="urgent-help"><h2 id="urgent-help">Khi nào cần cấp cứu ngay?</h2><p>Đau ngực dữ dội, khó thở nghiêm trọng, bất tỉnh hoặc đột ngột méo miệng, yếu một bên tay chân, nói khó: <strong>gọi 115 nếu ở Việt Nam</strong>, hoặc số cấp cứu tại nơi bạn đang ở. Đừng chờ AI trả lời.</p><p class="muted"><a href="https://bachmai.gov.vn/bai-viet/so-cuu-dot-quy-tai-nha-nhung-thao-tac-%E2%80%9Csong-con%E2%80%9D-ban-can-biet?id=66dbd998-49e4-4350-b1c7-042985aa42e0" target="_blank" rel="noopener noreferrer">Bệnh viện Bạch Mai: Nhận biết dấu hiệu đột quỵ và gọi cấp cứu</a></p></section>
+<section class="card" id="checklist-di-kham" aria-labelledby="healthShareTitle">
+<h2 id="healthShareTitle">Checklist đi khám</h2>
+<p class="muted">Ví dụ giả định, dùng để chia sẻ. Không lấy nội dung từ nhật ký hay cuộc hỏi AI.</p>
+<details><summary>Xem bản mẫu</summary>
+<ol><li>Ghi vấn đề chính, bắt đầu khi nào và thay đổi ra sao.</li><li>Chọn 2–3 câu hỏi quan trọng nhất cho bác sĩ.</li><li>Trước khi về, nhắc lại bước tiếp theo bằng lời của mình.</li></ol>
+<p class="muted">Đây là gợi ý chuẩn bị, không phải chẩn đoán.</p>
+<button type="button" class="secondary" id="copyHealthChecklist">Sao chép checklist mẫu</button>
+<p class="status" id="healthChecklistStatus" role="status" aria-live="polite"></p>
+<div id="healthChecklistManual" hidden><label for="healthChecklistText">Checklist mẫu để sao chép thủ công</label><textarea id="healthChecklistText" readonly rows="6"></textarea></div>
+</details>
+</section>
 <section class="card" id="daily-health"><div class="hubmeta"><div><div class="eyebrow" style="color:var(--brand)">Your daily health learning</div><h2 style="margin:4px 0">Mỗi ngày khỏe hơn một chút</h2></div><span class="hubtag">Kiến thức giáo dục · Có chọn lọc</span></div><p class="muted">Bài học ngắn, câu hỏi hữu ích và thói quen nhỏ để bạn chủ động tìm hiểu sức khỏe.</p><nav class="hubnav"><a href="#daily-health">Hôm nay</a><a href="#health-library">Thư viện</a><a href="#health-quiz">Quiz</a><a href="#health-community">Đóng góp</a></nav><div class="notice">Thông tin trong thư viện là giáo dục sức khỏe phổ thông, không thay thế tư vấn cá nhân từ nhân viên y tế.</div></section>
 <section class="card" id="health-library"><h2>Thư viện kiến thức</h2><p class="muted">Tìm hiểu các chủ đề nền tảng. Nội dung khởi đầu được gắn nhãn kiến thức phổ thông; cần bổ sung nguồn y khoa và quy trình duyệt trước khi phát hành như nội dung chuyên môn.</p><input class="hubsearch" id="healthSearch" type="search" placeholder="Tìm ngủ, dinh dưỡng, vận động..."><div class="hubgrid" id="healthLessons">
 <article class="lesson" data-tags="ngủ giấc ngủ nghỉ ngơi"><div class="topic">Giấc ngủ</div><h3>Hiểu về nhịp sinh học</h3><p>Vì sao thời gian ngủ và lịch sinh hoạt đều đặn có ý nghĩa?</p><button class="secondary" data-health-detail="sleep">Đọc bài học</button></article>
@@ -53,6 +64,18 @@ function readLogFields(){return Object.fromEntries(logFields.map(id=>[id,$(id).v
 function resetSummary(message="Chưa có tóm tắt."){$("summary").textContent=message;$("copySummary").disabled=true}
 for(const id of logFields)$(id).addEventListener("input",()=>{if(!$("copySummary").disabled)resetSummary("Nhật ký đã thay đổi. Hãy tạo lại tóm tắt trước khi sao chép.")});
 function setStatus(id,msg){$(id).textContent=msg}
+const publicHealthChecklist=[
+  "CHECKLIST ĐI KHÁM · Ví dụ giả định",
+  "1. Ghi vấn đề chính, bắt đầu khi nào và thay đổi ra sao.",
+  "2. Chọn 2–3 câu hỏi quan trọng nhất cho bác sĩ.",
+  "3. Trước khi về, nhắc lại bước tiếp theo bằng lời của mình.",
+  "Gợi ý chuẩn bị, không phải chẩn đoán.",
+  "https://minhnv90.github.io/-pi-health-ai/#checklist-di-kham"
+].join("\n");
+$("copyHealthChecklist").addEventListener("click",async()=>{
+  try{await navigator.clipboard.writeText(publicHealthChecklist);setStatus("healthChecklistStatus","Đã sao chép checklist mẫu. Chưa gửi cho ai.")}
+  catch(_){$("healthChecklistManual").hidden=false;const field=$("healthChecklistText");field.value=publicHealthChecklist;field.focus();field.select();setStatus("healthChecklistStatus","Không thể sao chép tự động. Hãy sao chép phần mẫu đã chọn.")}
+});
 if(window.Pi){try{Pi.init({version:"2.0",sandbox:new URLSearchParams(window.location.search).get("piSandbox")==="1"})}catch(e){setStatus("piStatus","Không khởi tạo được Pi SDK: "+e.message)}}else{setStatus("piStatus","Không tìm thấy Pi SDK. Hãy mở ứng dụng trong Pi Browser.")}
 $("piLogin").addEventListener("click",async()=>{if(!window.Pi){setStatus("piStatus","Pi SDK chưa sẵn sàng. Hãy mở trong Pi Browser.");return}const endpoint="https://pi-health-ai.nguyenminh2290.workers.dev";try{setStatus("piStatus","Đang xác thực với Pi...");const auth=await Pi.authenticate(["username"]);const response=await fetch(endpoint+"/api/pi/verify",{method:"POST",headers:{"Authorization":"Bearer "+auth.accessToken,"Content-Type":"application/json"}});const data=await response.json();if(!response.ok||!data.verified)throw new Error(data.error||"Không xác minh được tài khoản");piUser=data.user;setStatus("piStatus","Đã xác minh Pi: @"+piUser.username+" · UID được xác thực ở backend.")}catch(e){piUser=null;setStatus("piStatus","Đăng nhập chưa hoàn tất: "+(e.message||e))}});
 $("piLogout").addEventListener("click",()=>{piUser=null;setStatus("piStatus","Đã xóa tên người dùng khỏi giao diện. Để thu hồi quyền ứng dụng, hãy quản lý trong Pi Wallet.")});
