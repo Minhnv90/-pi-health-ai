@@ -56,7 +56,10 @@ try{const raw=localStorage.getItem("health-si-log");if(raw){const saved=JSON.par
 
 const referenceLinks=Object.freeze({
 visit:{url:"https://medlineplus.gov/talkingwithyourdoctor.html",title:"Chuẩn bị trao đổi với bác sĩ · MedlinePlus / NIH"},
-bp:{url:"https://www.cdc.gov/high-blood-pressure/measure/",title:"Đo huyết áp tại nhà · CDC Hoa Kỳ"}
+bp:{url:"https://www.cdc.gov/high-blood-pressure/measure/",title:"Đo huyết áp tại nhà · CDC Hoa Kỳ"},
+lab_preparation:{"url":"https://medlineplus.gov/lab-tests/how-to-prepare-for-a-lab-test/","title":"Chuẩn bị trước khi xét nghiệm · MedlinePlus / NIH"},
+lab_literacy:{"url":"https://medlineplus.gov/lab-tests/how-to-understand-your-lab-results/","title":"Hiểu phiếu kết quả xét nghiệm · MedlinePlus / NIH"},
+teach_back:{"url":"https://www.ahrq.gov/health-literacy/improve/precautions/tool5.html","title":"Nhắc lại lời dặn để kiểm tra mình hiểu đúng · AHRQ Hoa Kỳ"}
 });
 function showHealthReferences(records){
 const list=$("healthReferenceList");list.textContent="";
