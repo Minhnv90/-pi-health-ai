@@ -6,16 +6,29 @@ Examples (fictional, do not quote them unless relevant):
 - “Tôi đột ngột khó nói và yếu một bên tay.” → Lead immediately with calling emergency services (115 in Vietnam); no questionnaire, diagnosis, or medication.
 - “Tôi uống gấp đôi liều thuốc được không?” → Do not give a dose or suggest changing it. Ask the person to check with their prescriber or pharmacist; if they already took too much or feel unwell, seek urgent professional advice.
 `;
-const RELEASE = "health-sources-20261122-2";
+const RELEASE = "health-sources-20261122-3";
 // Fixed public health reference cards. Matched by topic, not diagnosis; no external lookups.
 const HEALTH_REFERENCE_CARDS = Object.freeze([
   { id: "visit", title: "Chuẩn bị trao đổi với bác sĩ", organization: "MedlinePlus / NIH", url: "https://medlineplus.gov/talkingwithyourdoctor.html", terms: ["đi khám","buổi khám","gặp bác sĩ","hỏi bác sĩ","nói với bác sĩ","ghi triệu chứng","ghi lại triệu chứng","doctor visit","appointment"], summary: "Ghi vài câu hỏi ưu tiên. Mô tả triệu chứng bắt đầu khi nào, diễn biến và điều làm dễ chịu hơn hoặc nặng lên. Nếu chưa hiểu lời dặn, hỏi lại hoặc xin hướng dẫn bằng văn bản." },
   { id: "bp", title: "Đo huyết áp tại nhà", organization: "CDC Hoa Kỳ", url: "https://www.cdc.gov/high-blood-pressure/measure/", terms: ["đo huyết áp","cách đo áp huyết","máy đo huyết áp","vòng bít","measure blood pressure","blood pressure measurement"], summary: "Trước khi đo, ngồi nghỉ ít nhất 5 phút, tựa lưng, đặt chân phẳng trên sàn, không bắt chéo chân. Đỡ cánh tay ngang ngực, đặt vòng bít sát trên bắp tay trần và không nói khi đo." }
 ]);
+function splitHealthReferenceText(text) {
+  return text.toLowerCase().normalize("NFC").match(/[\p{L}\p{M}\p{N}]+/gu) || [];
+}
+function foldHealthReferenceToken(token) {
+  return token.normalize("NFD").replace(/\p{M}+/gu, "").replace(/đ/g, "d");
+}
 function matchHealthReferences(question) {
-  const normalized = question.toLowerCase().normalize("NFKC").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
-  const words = " " + normalized + " ";
-  return HEALTH_REFERENCE_CARDS.filter(card => card.terms.some(term => words.includes(" " + term + " ")));
+  const query = splitHealthReferenceText(question);
+  return HEALTH_REFERENCE_CARDS.filter(card => card.terms.some(term => {
+    const tokens = splitHealthReferenceText(term);
+    return query.some((_, start) => start + tokens.length <= query.length &&
+      tokens.every((token, index) => {
+        const actual = query[start + index];
+        const unaccented = foldHealthReferenceToken(actual);
+        return actual === token || (actual === unaccented && unaccented === foldHealthReferenceToken(token));
+      }));
+  }));
 }
 const cors = (request, env) => {
   const origin = request.headers.get("Origin") || "";
