@@ -6,7 +6,7 @@ const id = staging.match(/^database_id\s*=\s*"([^"]+)"/m)?.[1];
 assert.match(staging, /^name = "pi-health-ai-staging"$/m);
 assert.match(staging, /^binding = "KNOWLEDGE_DB"$/m);
 assert.match(staging, /^database_name = "health-knowledge-staging"$/m);
-assert.match(id || "", /^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i);
+assert.equal(id, "00000000-0000-0000-0000-000000000000", "Unverified staging D1 must remain a non-deployable placeholder");
 assert.ok(!prod.includes(id), "Staging D1 identifier must not appear in production config");
 assert.match(staging, /^HEALTH_STAGING_ONLY = "true"$/m);
 assert.doesNotMatch(staging, /^\s*\[triggers\]/m);
