@@ -104,6 +104,10 @@ async function handleKnowledge(request, env, headers, url) {
 }
 
 export default {
+  // Safe no-op: staging Cron verification only; no writes, network or AI calls.
+  async scheduled(event, env, ctx) {
+    console.log("Scheduled staging check (no-op); cron:", event.cron);
+  },
   async fetch(request, env) {
     const url = new URL(request.url);
     if (request.method === "GET" && (url.pathname === "/" || url.pathname === "/api/status")) {
