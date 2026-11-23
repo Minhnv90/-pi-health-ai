@@ -14,6 +14,6 @@ binding = "AI"
 [[d1_databases]]
 binding = "KNOWLEDGE_DB"
 database_name = "health-knowledge-staging"
-database_id = "2b945c69-09da-4e6c-a6ad-d4814b485d3f"
+database_id = "00000000-0000-0000-0000-000000000000" # PLACEHOLDER: replace only after verifying staging D1 in Cloudflare
 
 # No secrets in source. Admin credentials belong in Cloudflare secrets.
