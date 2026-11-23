@@ -2,7 +2,7 @@
 
 Repo: Minhnv90/-pi-health-ai. Staging branch: feature/health-staging-safety-20261123.
 
-Staging Worker: `pi-health-ai-staging`. Staging D1: `health-knowledge-staging` with UUID `2b945c69-09da-4e6c-a6ad-d4814b485d3f` (owner-provided in previous project work; verify identity in Cloudflare before remote operations).
+Staging Worker: `pi-health-ai-staging`. Staging D1: `health-knowledge-staging` with a deliberately invalid placeholder UUID. The previously proposed UUID was not verified as a real staging database and must not be used. Verify/create an isolated D1 in Cloudflare, then set its real UUID only after separate deployment approval.
 
 All tests are offline and do not prove that Cloudflare Workers AI or remote D1 is working. No remote migrations or deploy have been executed.
 
