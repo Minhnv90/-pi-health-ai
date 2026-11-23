@@ -35,18 +35,20 @@ The isolated API worker is in `worker.js`; configuration is in `wrangler.toml`.
 It exposes `POST /api/health-assist` and requires an explicit `consent: true` field.
 It does not persist request bodies. Health questions are forwarded to the configured AI provider, so obtain informed consent before sending any personal health information.
 
-### Deploy
-1. Install Node.js LTS and run `npm install -g wrangler`.
-2. Run `npx wrangler login` from this repository folder.
-3. Replace the placeholder origin in `wrangler.toml` with the exact deployed Health SI Pages origin.
-4. Set secrets (use your chosen OpenAI-compatible chat-completions endpoint and model):
-   - `npx wrangler secret put AI_CHAT_COMPLETIONS_URL`
-   - `npx wrangler secret put AI_API_KEY`
-   - `npx wrangler secret put AI_MODEL`
-5. Deploy with `npx wrangler deploy`.
+### Current Cloudflare Workers AI configuration (staging only)
 
-The frontend prototype is not yet wired to this API. After deployment, configure the frontend to call your Worker URL. Do not put provider keys in frontend code or GitHub.
+The Worker calls `env.AI.run(env.AI_MODEL, ...)` via native Cloudflare Workers AI (`[ai] binding = "AI"`). The `AI_MODEL` variable is configured in `wrangler.toml`. The old `AI_CHAT_COMPLETIONS_URL` and `AI_API_KEY` settings are not used. Never commit API tokens or personal health data.
 
+### Safe staging preparation
+
+1. Keep `main`, production Worker and existing data unchanged. This branch is not deployed.
+2. Cron `0 */6 * * *` means every six hours (UTC). `scheduled()` is an intentional no-op: it logs only, with no AI, web requests or database writes.
+3. Create a new isolated D1 staging database `health-si-staging` in Cloudflare. After creation, replace the placeholder database ID in the commented `[[d1_databases]]` template and uncomment it. Use binding `KNOWLEDGE_DB` (matching `env.KNOWLEDGE_DB`). Never use production database IDs.
+4. Review migration SQL and apply only to staging with explicit approval. Do not store actual health records in testing.
+5. Test mock AI, explicit consent, emergency symptoms, medication requests, malformed JSON, denied origins, admin authentication and privacy using synthetic examples. Record results before release.
+6. A future staging deployment requires a distinct Worker name, isolated bindings and separate approval. Never use a default `wrangler deploy` to replace an existing Worker.
+
+This preparation does not verify model availability, real AI responses, database connectivity or Pi Mainnet.
 
 ## Pi identity verification
 
