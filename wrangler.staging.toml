@@ -1,0 +1,19 @@
+# Isolated Health SI staging only. Do not deploy or run remote migrations without approval.
+name = "pi-health-ai-staging"
+main = "worker.js"
+compatibility_date = "2026-11-21"
+
+[vars]
+ALLOWED_ORIGINS = "http://localhost:8788"
+AI_MODEL = "@cf/google/gemma-4-26b-a4b-it"
+HEALTH_STAGING_ONLY = "true"
+
+[ai]
+binding = "AI"
+
+[[d1_databases]]
+binding = "KNOWLEDGE_DB"
+database_name = "health-knowledge-staging"
+database_id = "2b945c69-09da-4e6c-a6ad-d4814b485d3f"
+
+# No secrets in source. Admin credentials belong in Cloudflare secrets.
