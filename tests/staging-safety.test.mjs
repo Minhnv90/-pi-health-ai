@@ -8,7 +8,9 @@ test("Health staging has isolated D1 and distinct Worker name", () => {
   const output = execFileSync(process.execPath, ["scripts/verify-staging-config.mjs"], { encoding: "utf8" });
   assert.match(output, /validated/);
   assert.match(staging, /health-knowledge-staging/);
-  assert.doesNotMatch(staging, /portway-si-knowledge-staging|63a484b4-ab0f-4f9f-a299-78fca28f6755/);
+  const ids = staging.match(/[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}/gi) ?? [];
+  assert.deepEqual(ids, ["00000000-0000-0000-0000-000000000000"]);
+  assert.match(staging, /^namespace_id = "2091"$/m);
 });
 test("approved-only knowledge retrieval", () => {
   assert.match(worker, /approval_status = 'approved'/);
