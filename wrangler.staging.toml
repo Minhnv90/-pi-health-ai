@@ -17,3 +17,10 @@ database_name = "health-knowledge-staging"
 database_id = "00000000-0000-0000-0000-000000000000" # PLACEHOLDER: replace only after verifying staging D1 in Cloudflare
 
 # No secrets in source. Admin credentials belong in Cloudflare secrets.
+
+[[ratelimits]]
+name = "RATE_LIMITER"
+namespace_id = "2091"
+[ratelimits.simple]
+limit = 6
+period = 60
