@@ -2,7 +2,7 @@
 
 Repo: Minhnv90/-pi-health-ai. Staging branch: feature/health-staging-safety-20261123.
 
-Staging Worker: `pi-health-ai-staging`. Staging D1: `health-knowledge-staging` with a deliberately invalid placeholder UUID. The previously proposed UUID was not verified as a real staging database and must not be used. Verify/create an isolated D1 in Cloudflare, then set its real UUID only after separate deployment approval.
+Staging Worker: `pi-health-ai-staging`. Staging D1: `health-knowledge-staging` with a deliberately invalid placeholder UUID. The previously proposed UUID was not verified as a real staging database and must not be used. Keep the placeholder in Git. Never commit a real staging D1 UUID; use an ignored local configuration after separate approval.
 
 All tests are offline and do not prove that Cloudflare Workers AI or remote D1 is working. No remote migrations or deploy have been executed.
 
@@ -19,3 +19,6 @@ All tests are offline and do not prove that Cloudflare Workers AI or remote D1 i
 3. If table is missing, separately approve staging-only migration.
 4. Configure staging secrets privately and approve staging deployment separately.
 5. Test Workers AI, CORS, Pi verification and clinical safety on staging before considering production.
+
+## Step 1 staging (owner only, after approval)
+Copy `wrangler.staging.toml` to `wrangler.staging.local.toml`, remove the entire D1 block, retain rate limit namespace 2091, and use the integrated PR #1 + PR #2 test branch. Run `npx wrangler deploy -c wrangler.staging.local.toml` only after approval. Serve a disposable frontend copy on localhost:8788 with its API_BASE pointing only to verified staging. Do not commit that frontend change. Use synthetic data. D1 setup above is deferred to the knowledge step. Offline tests do not count toward the 17 staging checks.
