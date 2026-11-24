@@ -145,6 +145,7 @@ export default {
     } catch {
       return Response.json({ error: "Invalid JSON." }, { status: 400, headers });
     }
+    if (!body || typeof body !== "object" || Array.isArray(body)) return Response.json({ error: "Invalid JSON object." }, { status: 400, headers });
     if (body.consent !== true) return Response.json({ error: "Explicit consent is required." }, { status: 400, headers });
     const question = typeof body.question === "string" ? body.question.trim() : "";
     if (!question || question.length > 5000) return Response.json({ error: "Question must contain 1–5000 characters." }, { status: 400, headers });
