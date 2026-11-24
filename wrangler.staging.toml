@@ -1,0 +1,9 @@
+name = "health-si-staging"
+main = "worker.js"
+compatibility_date = "2026-11-21"
+[vars]
+ALLOWED_ORIGINS = "http://localhost:8788,http://localhost:3000"
+AI_MODEL = "@cf/google/gemma-4-26b-a4b-it"
+[ai]
+binding = "AI"
+# Bind a dedicated Health SI staging D1 database before remote deployment.
