@@ -10,3 +10,11 @@ AI_MODEL = "@cf/google/gemma-4-26b-a4b-it"
 
 [ai]
 binding = "AI"
+
+[[ratelimits]]
+name = "RATE_LIMITER"
+namespace_id = "2001"
+
+  [ratelimits.simple]
+  limit = 6
+  period = 60

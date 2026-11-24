@@ -132,10 +132,20 @@ export default {
     if (typeof env.AI?.run !== "function" || !env.AI_MODEL) {
       return Response.json({ error: "AI service is not configured. Missing: " + [typeof env.AI?.run === "function" ? null : "AI", env.AI_MODEL ? null : "AI_MODEL"].filter(Boolean).join(", "), code: "AI_CONFIG_MISSING" }, { status: 503, headers });
     }
+    if (env.RATE_LIMITER) {
+      const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+      const { success } = await env.RATE_LIMITER.limit({ key: "health:" + ip });
+      if (!success) return Response.json({ error: "Bạn gửi quá nhanh. Vui lòng thử lại sau ít phút.", code: "RATE_LIMITED" }, { status: 429, headers: { ...headers, "Retry-After": "60" } });
+    }
     let body;
-    try { body = await request.json(); } catch {
+    try {
+      const raw = await request.text();
+      if (raw.length > 20000) return Response.json({ error: "Yêu cầu quá lớn.", code: "PAYLOAD_TOO_LARGE" }, { status: 413, headers });
+      body = JSON.parse(raw);
+    } catch {
       return Response.json({ error: "Invalid JSON." }, { status: 400, headers });
     }
+    if (!body || typeof body !== "object" || Array.isArray(body)) return Response.json({ error: "Invalid JSON object." }, { status: 400, headers });
     if (body.consent !== true) return Response.json({ error: "Explicit consent is required." }, { status: 400, headers });
     const question = typeof body.question === "string" ? body.question.trim() : "";
     if (!question || question.length > 5000) return Response.json({ error: "Question must contain 1–5000 characters." }, { status: 400, headers });
