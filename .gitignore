@@ -1,0 +1,4 @@
+/wrangler.staging.local.toml
+/.wrangler/
+/.dev.vars
+/.dev.vars.*

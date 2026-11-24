@@ -1,0 +1,22 @@
+name: Health SI staging safety tests
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check syntax
+        run: |
+          node --check worker.js
+          node --check scripts/verify-staging-config.mjs
+      - name: Run offline safety tests
+        run: node --test tests/*.test.mjs
+      - name: Verify staging config
+        run: node scripts/verify-staging-config.mjs
