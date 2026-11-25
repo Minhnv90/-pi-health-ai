@@ -1,4 +1,4 @@
-import { preferenceMemory } from "./modules/memory.mjs";
+import { preferenceMemory, memoryContext } from "./modules/memory.mjs";
 import { knowledgeMcp } from "./modules/knowledge-mcp.mjs";
 import { teacherPrompt } from "./modules/teacher.mjs";
 // Examples illustrate boundaries; they do not replace clinician judgment.
@@ -190,7 +190,7 @@ export default {
         max_completion_tokens: 600,
         chat_template_kwargs: { enable_thinking: false },
         store: false,
-        messages: [{ role: "system", content: system + RESPONSE_EXAMPLES + knowledgeContext + retrievedContext }, { role: "user", content: question }]
+        messages: [{ role: "system", content: system + RESPONSE_EXAMPLES + knowledgeContext + retrievedContext + await memoryContext(request, env, body.use_memory) }, { role: "user", content: question }]
       });
       const answer = data?.choices?.[0]?.message?.content ?? data?.response;
       if (typeof answer !== "string" || !answer.trim()) return Response.json({ error: "Empty AI response." }, { status: 502, headers });
