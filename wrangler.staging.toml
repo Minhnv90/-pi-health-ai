@@ -13,4 +13,7 @@ binding = "AI"
 binding = "MEMORY_KV"
 id = "629eb30b9af743fe9d433e348c42149b"
 
-# Bind the dedicated Health staging KNOWLEDGE_DB after its ID is verified.
+[[d1_databases]]
+binding = "KNOWLEDGE_DB"
+database_name = "health-si-knowledge-staging"
+database_id = "54ea4dac-b6fd-4d21-a0fa-67c79d0d9693"
