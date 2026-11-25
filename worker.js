@@ -1,3 +1,4 @@
+import { teacherPrompt } from "./modules/teacher.mjs";
 // Examples illustrate boundaries; they do not replace clinician judgment.
 const RESPONSE_EXAMPLES = `
 Examples (fictional, do not quote them unless relevant):
@@ -125,6 +126,21 @@ export default {
         if (typeof user?.uid !== "string" || !user.uid) return Response.json({ error: "Pi returned an invalid identity response." }, { status: 502, headers });
         return Response.json({ verified: true, user: { uid: user.uid, username: String(user.username || "") } }, { headers });
       } catch { return Response.json({ error: "Could not reach Pi Platform API." }, { status: 502, headers }); }
+    }
+    if (url.pathname === "/api/teacher" && request.method === "POST") {
+      if (typeof env.AI?.run !== "function" || !env.AI_MODEL) return Response.json({error:"AI service is not configured.",code:"AI_CONFIG_MISSING"},{status:503,headers});
+      let body, messages;
+      try {
+        body = await request.json();
+        if (body?.consent !== true) return Response.json({error:"Explicit consent is required."},{status:400,headers});
+        messages = teacherPrompt(body);
+      } catch { return Response.json({error:"Invalid Teacher input."},{status:400,headers}); }
+      try {
+        const data = await env.AI.run(env.AI_MODEL,{temperature:0.2,max_completion_tokens:600,chat_template_kwargs:{enable_thinking:false},store:false,messages});
+        const answer = [data?.choices?.[0]?.message?.content,data?.response].find(v=>typeof v==="string"&&v.trim());
+        if (!answer) return Response.json({error:"Empty AI response.",code:"AI_EMPTY_RESPONSE"},{status:502,headers});
+        return Response.json({answer:answer.trim(),mode:"teacher",disclaimer:"AI có thể sai; hãy đối chiếu với giáo viên."},{headers});
+      } catch { return Response.json({error:"Could not reach AI provider.",code:"AI_PROVIDER_ERROR"},{status:502,headers}); }
     }
     if (url.pathname !== "/api/health-assist" || request.method !== "POST") {
       return Response.json({ error: "Not found" }, { status: 404, headers });
