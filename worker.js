@@ -1,3 +1,4 @@
+import { knowledgeMcp } from "./modules/knowledge-mcp.mjs";
 import { teacherPrompt } from "./modules/teacher.mjs";
 // Examples illustrate boundaries; they do not replace clinician judgment.
 const RESPONSE_EXAMPLES = `
@@ -107,6 +108,7 @@ async function handleKnowledge(request, env, headers, url) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (url.pathname === "/mcp") return knowledgeMcp(request, env, searchKnowledge);
     if (request.method === "GET" && (url.pathname === "/" || url.pathname === "/api/status")) {
       return Response.json({ service: "Health SI", status: "online", release: RELEASE, ai_configured: Boolean(typeof env.AI?.run === "function" && env.AI_MODEL), missing_config: [typeof env.AI?.run === "function" ? null : "AI", env.AI_MODEL ? null : "AI_MODEL"].filter(Boolean), note: "Status only; AI response is not tested." }, { headers: { "Cache-Control": "no-store", "Access-Control-Allow-Origin": "*" } });
     }
