@@ -3,7 +3,8 @@ import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 const teacherUrl = new URL("../modules/teacher.mjs", import.meta.url).href;
 const source = (await readFile(new URL("../worker.js", import.meta.url), "utf8")).replace("./modules/teacher.mjs", teacherUrl);
-const worker = (await import("data:text/javascript;base64," + Buffer.from(source).toString("base64"))).default;
+const resolved = source.replace(/(["'])(\.\/modules\/[^"']+)\1/g, (_,q,p)=>q+new URL("../"+p.slice(2),import.meta.url).href+q);
+const worker=(await import("data:text/javascript;base64,"+Buffer.from(resolved).toString("base64"))).default;
 test("approved RAG reaches AI, draft excluded, citations distinguished", async () => {
   let messages;
   const env = {ALLOWED_ORIGINS:"https://example.test", AI_MODEL:"fake", AI:{run:async (_, args)=>{messages=args.messages;return {response:"Thông tin tham khảo [N1]"};}}, KNOWLEDGE_DB:{prepare(sql){assert.match(sql,/approval_status = 'approved'/);return {bind(){return {all:async()=>({results:[{approval_status:"approved",title:"Test",body:"FAKE_APPROVED_MARKER",source_url:"https://example.test/source"},{approval_status:"draft",body:"FAKE_DRAFT_MARKER",source_url:"https://example.test/draft"}]})};}};}}};
