@@ -1,0 +1,16 @@
+name = "pi-health-ai-staging"
+main = "worker.js"
+compatibility_date = "2026-11-21"
+
+[vars]
+ALLOWED_ORIGINS = "https://minhnv90.github.io,https://healthcarebecbfa6251.pinet.com"
+AI_MODEL = "@cf/google/gemma-4-26b-a4b-it"
+
+[ai]
+binding = "AI"
+
+[[kv_namespaces]]
+binding = "MEMORY_KV"
+id = "629eb30b9af743fe9d433e348c42149b"
+
+# Bind the dedicated Health staging KNOWLEDGE_DB after its ID is verified.
