@@ -16,7 +16,7 @@ jobs:
       - name: Extract frontend source
         run: |
           test -f frontend-source.zip || { echo "::error::Upload frontend-source.zip to this branch"; exit 1; }
-          echo 'ce0ddc5691c587ff2361f5bf2140cede27dc8c8717857413b04b75875f473539  frontend-source.zip' | sha256sum -c -
+          echo 'a6c185c1e66889e7813005764856d1c4a4cb36f3625478d93704ab7e9fcd9ae7  frontend-source.zip' | sha256sum -c -
           mkdir -p frontend-build
           unzip -q frontend-source.zip -d frontend-build
           test -f frontend-build/package.json
