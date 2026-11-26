@@ -73,6 +73,7 @@ async function handleKnowledge(request, env, headers, url) {
   if (url.pathname === "/api/knowledge/search" && request.method === "POST") {
     if (!env.KNOWLEDGE_DB) return Response.json({ error: "Knowledge database is not configured." }, { status: 503, headers });
     let body; try { body = await request.json(); if (!body || typeof body !== "object" || Array.isArray(body)) throw new TypeError("Expected JSON object"); } catch { return Response.json({ error: "Invalid JSON." }, { status: 400, headers }); }
+    if (!body || typeof body !== "object" || Array.isArray(body)) return Response.json({ error: "Invalid search body." }, { status: 400, headers });
     const query = safeText(body.query, 1000);
     if (!query) return Response.json({ error: "A search query is required." }, { status: 400, headers });
     const records = await searchKnowledge(env, query, 8);
