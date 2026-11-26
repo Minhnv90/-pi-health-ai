@@ -5,6 +5,7 @@ import React, {
   useContext,
   useState,
   useEffect,
+  useRef,
   type ReactNode,
 } from "react";
 import { PI_NETWORK_CONFIG, BACKEND_URLS } from "@/lib/system-config";
@@ -80,6 +81,8 @@ export function PiAuthProvider({ children }: { children: ReactNode }) {
   const [piAccessToken, setPiAccessToken] = useState<string | null>(null);
   const [userData, setUserData] = useState<LoginDTO | null>(null);
 
+  const busy = useRef(false);
+
   const authenticateAndLogin = async (): Promise<void> => {
     setAuthMessage("Authenticating with Pi Network...");
     const piAuthResult = await authDeadline(window.Pi.authenticate(["username"], () => {}), "Pi authentication");
@@ -112,6 +115,8 @@ export function PiAuthProvider({ children }: { children: ReactNode }) {
   };
 
   const initializePiAndAuthenticate = async () => {
+    if (busy.current) return;
+    busy.current = true;
     setIsAuthenticated(false);
     setPiAccessToken(null);
     setUserData(null);
@@ -142,6 +147,8 @@ export function PiAuthProvider({ children }: { children: ReactNode }) {
       setAuthMessage(
         previous => `${previous} Failed. Please retry.`
       );
+    } finally {
+      busy.current = false;
     }
   };
 
