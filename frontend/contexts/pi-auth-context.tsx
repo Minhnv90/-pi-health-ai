@@ -145,7 +145,7 @@ export function PiAuthProvider({ children }: { children: ReactNode }) {
     } catch (err) {
       console.error("Pi authentication failed");
       setAuthMessage(
-        previous => `${previous} Failed. Please retry.`
+        previous => { const message = err instanceof Error ? err.message : ""; const safe = /^(Pi verification HTTP [1-5][0-9]{2}|Pi authentication timed out|Pi SDK load timed out|Pi SDK init timed out|Invalid verified identity|Missing Pi access token)$/.test(message) ? message : "Check Pi SDK, app domain or network"; return `${previous} Failed. ${safe}. Please retry.`; }
       );
     } finally {
       busy.current = false;
