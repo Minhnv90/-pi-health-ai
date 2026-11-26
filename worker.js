@@ -58,16 +58,18 @@ const KNOWLEDGE_FIELDS = ["id","title","topic","summary","body","source_title","
 const APPROVAL_STATES = ["draft","needs_review","approved","archived"];
 const safeText = (value, max = 12000) => String(value ?? "").trim().slice(0, max);
 async function searchKnowledge(env, question, limit = 5) {
-  if (!env.KNOWLEDGE_DB) return [];
-  const terms = [...new Set((question.toLowerCase().match(/[\p{L}\p{N}]{3,}/gu) || []).slice(0, 8))];
+  if (!env.KNOWLEDGE_DB || typeof question !== "string") return [];
+  const terms = [...new Set((question.normalize("NFC").toLowerCase().match(/[\p{L}\p{N}]{3,}/gu) || []).filter(t => !["the","and","for","what","with","của","cho","những","trong","được","như","nào","một","các","với","không"].includes(t)))].slice(0, 8);
   if (!terms.length) return [];
-  const clauses = terms.map(() => "(title LIKE ? OR summary LIKE ? OR body LIKE ? OR tags LIKE ?)");
-  const sql = "SELECT * FROM " + KNOWLEDGE_TABLE + " WHERE approval_status = 'approved' AND source_url LIKE 'https://%' AND trim(body) <> '' AND (" + clauses.join(" OR ") + ") ORDER BY modified_at DESC LIMIT ?";
-  const binds = [];
-  for (const term of terms) { const p = "%" + term + "%"; binds.push(p,p,p,p); }
-  binds.push(Math.max(1, Math.min(8, limit)));
-  const result = await env.KNOWLEDGE_DB.prepare(sql).bind(...binds).all();
-  return result.results || [];
+  const fields = ["title","summary","body","tags"];
+  const weights = fields.map(f => f === "title" ? 6 : f === "body" ? 1 : 3);
+  const score = terms.flatMap(() => fields.map((f,i) => "(CASE WHEN " + f + " LIKE ? THEN " + weights[i] + " ELSE 0 END)")).join(" + ");
+  const clauses = terms.map(() => "(" + fields.map(f => f + " LIKE ?").join(" OR ") + ")");
+  const sql = "SELECT *, (" + score + ") AS relevance_score FROM " + KNOWLEDGE_TABLE + " WHERE approval_status = 'approved' AND source_url LIKE 'https://%' AND trim(body) <> '' AND (" + clauses.join(" OR ") + ") ORDER BY relevance_score DESC, modified_at DESC, id ASC LIMIT ?";
+  const patterns = terms.flatMap(t => fields.map(() => "%" + t + "%"));
+  const boundedLimit = Math.max(1, Math.min(8, Number.isFinite(limit) ? Math.trunc(limit) : 5));
+  const result = await env.KNOWLEDGE_DB.prepare(sql).bind(...patterns, ...patterns, boundedLimit).all();
+  return (result.results || []).map(({ relevance_score, ...record }) => record);
 }
 async function handleKnowledge(request, env, headers, url) {
   if (url.pathname === "/api/knowledge/search" && request.method === "POST") {
