@@ -28,3 +28,6 @@ test('MCP denies invalid token, origin and mutations; filters records',async()=>
  const out=await (await knowledgeMcp(req('tools/call','test-only','https://example.com',{name:'search_knowledge',arguments:{query:'x'}}),env,search)).json();
  assert.equal(JSON.parse(out.result.content[0].text).records.length,1);
 });
+
+import worker from '../worker.js';
+test('knowledge search rejects malformed JSON objects',async()=>{for(const body of ['null','[]','{','{}']){const request=new Request('https://worker.example/api/knowledge/search',{method:'POST',headers:{'Content-Type':'application/json',Origin:'https://example.com'},body});const response=await worker.fetch(request,{ALLOWED_ORIGINS:'https://example.com',KNOWLEDGE_DB:{}},{});assert.equal(response.status,400);}});
