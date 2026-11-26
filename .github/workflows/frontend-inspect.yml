@@ -13,13 +13,11 @@ jobs:
         with:
           node-version: '22'
       - name: Inspect frontend configuration
+        working-directory: frontend
         run: |
-          test -f frontend-source.zip
-          echo 'a6c185c1e66889e7813005764856d1c4a4cb36f3625478d93704ab7e9fcd9ae7  frontend-source.zip' | sha256sum -c -
-          mkdir -p frontend-inspect
-          unzip -q frontend-source.zip -d frontend-inspect
-          cd frontend-inspect
+          test -f package.json
+          test -f pnpm-lock.yaml
+          test -f tsconfig.json
           node -e 'const p=require("./package.json"); console.log(JSON.stringify({scripts:p.scripts,dependencies:p.dependencies,devDependencies:p.devDependencies},null,2))'
           cat next.config.mjs
           find app/api -type f
-          test -f pnpm-lock.yaml
