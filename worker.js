@@ -72,7 +72,7 @@ async function searchKnowledge(env, question, limit = 5) {
 async function handleKnowledge(request, env, headers, url) {
   if (url.pathname === "/api/knowledge/search" && request.method === "POST") {
     if (!env.KNOWLEDGE_DB) return Response.json({ error: "Knowledge database is not configured." }, { status: 503, headers });
-    let body; try { body = await request.json(); } catch { return Response.json({ error: "Invalid JSON." }, { status: 400, headers }); }
+    let body; try { body = await request.json(); if (!body || typeof body !== "object" || Array.isArray(body)) throw new TypeError("Expected JSON object"); } catch { return Response.json({ error: "Invalid JSON." }, { status: 400, headers }); }
     const query = safeText(body.query, 1000);
     if (!query) return Response.json({ error: "A search query is required." }, { status: 400, headers });
     const records = await searchKnowledge(env, query, 8);
@@ -82,7 +82,7 @@ async function handleKnowledge(request, env, headers, url) {
     const auth = request.headers.get("Authorization") || "";
     if (!env.KNOWLEDGE_ADMIN_TOKEN || auth !== "Bearer " + env.KNOWLEDGE_ADMIN_TOKEN) return Response.json({ error: "Admin authentication required." }, { status: 401, headers });
     if (!env.KNOWLEDGE_DB) return Response.json({ error: "Knowledge database is not configured." }, { status: 503, headers });
-    let body; try { body = await request.json(); } catch { return Response.json({ error: "Invalid JSON." }, { status: 400, headers }); }
+    let body; try { body = await request.json(); if (!body || typeof body !== "object" || Array.isArray(body)) throw new TypeError("Expected JSON object"); } catch { return Response.json({ error: "Invalid JSON." }, { status: 400, headers }); }
     const record = body.record || {};
     const id = safeText(record.id, 120);
     const title = safeText(record.title, 300);
@@ -190,7 +190,7 @@ export default {
       if (typeof env.AI?.run !== "function" || !env.AI_MODEL) return Response.json({error:"AI service is not configured.",code:"AI_CONFIG_MISSING"},{status:503,headers});
       let body, messages;
       try {
-        body = await request.json();
+        body = await request.json(); if (!body || typeof body !== "object" || Array.isArray(body)) throw new TypeError("Expected JSON object");
         if (body?.consent !== true) return Response.json({error:"Explicit consent is required."},{status:400,headers});
         messages = teacherPrompt(body);
       } catch { return Response.json({error:"Invalid Teacher input."},{status:400,headers}); }
@@ -208,7 +208,7 @@ export default {
       return Response.json({ error: "AI service is not configured. Missing: " + [typeof env.AI?.run === "function" ? null : "AI", env.AI_MODEL ? null : "AI_MODEL"].filter(Boolean).join(", "), code: "AI_CONFIG_MISSING" }, { status: 503, headers });
     }
     let body;
-    try { body = await request.json(); } catch {
+    try { body = await request.json(); if (!body || typeof body !== "object" || Array.isArray(body)) throw new TypeError("Expected JSON object"); } catch {
       return Response.json({ error: "Invalid JSON." }, { status: 400, headers });
     }
     if (body.consent !== true) return Response.json({ error: "Explicit consent is required." }, { status: 400, headers });
