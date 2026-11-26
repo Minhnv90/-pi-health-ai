@@ -1,0 +1,30 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {preferenceMemory} from '../modules/memory.mjs';
+import {teacherPrompt} from '../modules/teacher.mjs';
+import {knowledgeMcp} from '../modules/knowledge-mcp.mjs';
+test('memory consent, isolation, deletion and TTL',async()=>{
+ const map=new Map(); const env={MEMORY_KV:{put:async(k,v,o)=>{assert.equal(o.expirationTtl,2592000);map.set(k,v)},get:async(k)=>JSON.parse(map.get(k)||'null'),delete:async(k)=>map.delete(k)}};
+ await assert.rejects(preferenceMemory(env,'a',{action:'save',preferences:{language:'vi'}}));
+ await assert.rejects(preferenceMemory(env,'a',{action:'save',consent:true,preferences:{medical:'secret'}}));
+ await preferenceMemory(env,'a',{action:'save',consent:true,preferences:{language:'vi'}});
+ assert.deepEqual(await preferenceMemory(env,'b',{action:'read'}),{preferences:{}});
+ assert.deepEqual(await preferenceMemory(env,'a',{action:'read'}),{preferences:{language:'vi'}});
+ await preferenceMemory(env,'a',{action:'delete'});assert.equal(map.size,0);
+});
+test('teacher validates grade, subject, question',()=>{
+ for(const grade of [0,13,1.5])assert.throws(()=>teacherPrompt({grade,subject:'Toán',question:'2+2'}));
+ assert.throws(()=>teacherPrompt({grade:1,subject:'invalid',question:'2+2'}));
+ assert.throws(()=>teacherPrompt({grade:1,subject:'Toán',question:'x'.repeat(2001)}));
+ assert.equal(teacherPrompt({grade:1,subject:'Toán',question:'2+2'})[1].content,'2+2');
+});
+test('MCP denies invalid token, origin and mutations; filters records',async()=>{
+ const env={MCP_READ_TOKEN:'test-only',ALLOWED_ORIGINS:'https://example.com',KNOWLEDGE_DB:{}};
+ const req=(method,token='test-only',origin='https://example.com',params={})=>new Request('https://example.com/mcp',{method:'POST',headers:{Authorization:'Bearer '+token,Origin:origin},body:JSON.stringify({jsonrpc:'2.0',id:1,method,params})});
+ const search=async()=>[{approval_status:'approved',source_url:'https://example.com',title:'public'},{approval_status:'pending',source_url:'https://example.com',title:'private'}];
+ assert.equal((await knowledgeMcp(req('ping','wrong'),env,search)).status,401);
+ assert.equal((await knowledgeMcp(req('ping','test-only','https://bad.example'),env,search)).status,403);
+ assert.equal((await (await knowledgeMcp(req('tools/call','test-only','https://example.com',{name:'delete',arguments:{query:'x'}}),env,search)).json()).error.code,-32602);
+ const out=await (await knowledgeMcp(req('tools/call','test-only','https://example.com',{name:'search_knowledge',arguments:{query:'x'}}),env,search)).json();
+ assert.equal(JSON.parse(out.result.content[0].text).records.length,1);
+});
