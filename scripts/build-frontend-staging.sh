@@ -1,29 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
-echo 'fb55c72d5f4830a6410b13bea35d93715395072d9763226ee09312391e564d37  frontend-source.zip' | sha256sum -c -
+echo 'ce0ddc5691c587ff2361f5bf2140cede27dc8c8717857413b04b75875f473539  frontend-source.zip' | sha256sum -c -
 mkdir -p frontend-opennext
 unzip -oq frontend-source.zip -d frontend-opennext
 cd frontend-opennext
-python3 - <<'PY'
-from pathlib import Path
-p=Path('contexts/pi-auth-context.tsx')
-s=p.read_text()
-helper='''
-function authDeadline<T>(promise: Promise<T>, stage: string): Promise<T> {
-  return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error("Authentication failed: " + stage + " timed out. Open in Pi Browser and retry.")), 20000);
-    promise.then(value => { clearTimeout(timer); resolve(value); }, error => { clearTimeout(timer); reject(error); });
-  });
-}
-'''
-assert 'const loadPiSDK' in s
-s=s.replace('const loadPiSDK',helper+'\nconst loadPiSDK',1)
-pairs=[('await loadPiSDK();','await authDeadline(loadPiSDK(), "SDK");'),('await window.Pi.authenticate(["username"]);','await authDeadline(window.Pi.authenticate(["username"]), "Pi login");'),('await window.Pi.init({','await authDeadline(window.Pi.init({'),('sandbox: PI_NETWORK_CONFIG.SANDBOX,\n      });','sandbox: PI_NETWORK_CONFIG.SANDBOX,\n      }), "Pi init");'),('await api.post<LoginDTO>(BACKEND_URLS.LOGIN, {\n      pi_auth_token: piAuthResult.accessToken,\n    });','await authDeadline(api.post<LoginDTO>(BACKEND_URLS.LOGIN, {\n      pi_auth_token: piAuthResult.accessToken,\n    }), "Backend login");')]
-for a,b in pairs:
- assert s.count(a)==1, a
- s=s.replace(a,b,1)
-p.write_text(s)
-PY
+# Pi authentication fixes are already included in the verified archive.
 corepack enable
 corepack prepare pnpm@9.15.9 --activate
 pnpm install --frozen-lockfile
