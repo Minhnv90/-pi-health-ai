@@ -1,6 +1,8 @@
 name: SI live staging smoke
 on:
-  pull_request:
+  push:
+    branches:
+      - fix/p0-health-rag-20261125
   workflow_dispatch:
 permissions:
   contents: read
