@@ -1,3 +1,4 @@
+import { reviewDueKnowledge } from "./modules/knowledge-cron.mjs";
 import { preferenceMemory, memoryContext } from "./modules/memory.mjs";
 import { knowledgeMcp } from "./modules/knowledge-mcp.mjs";
 import { teacherPrompt } from "./modules/teacher.mjs";
@@ -108,6 +109,9 @@ async function handleKnowledge(request, env, headers, url) {
 }
 
 export default {
+  async scheduled(controller, env, ctx) {
+    ctx.waitUntil(reviewDueKnowledge(env).then(result => console.log('Health knowledge review due count:',result.due)));
+  },
   async fetch(request, env) {
     const url = new URL(request.url);
     if (url.pathname === "/mcp") return knowledgeMcp(request, env, searchKnowledge);
