@@ -196,11 +196,15 @@ export default {
         messages = teacherPrompt(body);
       } catch { return Response.json({error:"Invalid Teacher input."},{status:400,headers}); }
       try {
-        const data = await env.AI.run(env.AI_MODEL,{temperature:0.2,max_completion_tokens:600,chat_template_kwargs:{enable_thinking:false},store:false,messages});
+        let timer;
+        const data = await Promise.race([
+          Promise.resolve().then(() => env.AI.run(env.AI_MODEL,{temperature:0.2,max_completion_tokens:600,chat_template_kwargs:{enable_thinking:false},store:false,messages})),
+          new Promise((_, reject) => { timer = setTimeout(() => reject(new Error("TEACHER_TIMEOUT")), 25000); })
+        ]).finally(() => clearTimeout(timer));
         const answer = [data?.choices?.[0]?.message?.content,data?.response].find(v=>typeof v==="string"&&v.trim());
         if (!answer) return Response.json({error:"Empty AI response.",code:"AI_EMPTY_RESPONSE"},{status:502,headers});
         return Response.json({answer:answer.trim(),mode:"teacher",disclaimer:"AI có thể sai; hãy đối chiếu với giáo viên."},{headers});
-      } catch { return Response.json({error:"Could not reach AI provider.",code:"AI_PROVIDER_ERROR"},{status:502,headers}); }
+      } catch (error) { if (error?.message === "TEACHER_TIMEOUT") return Response.json({error:"Teacher AI response timed out. Please try again.",code:"AI_TIMEOUT"},{status:504,headers}); return Response.json({error:"Could not reach AI provider.",code:"AI_PROVIDER_ERROR"},{status:502,headers}); }
     }
     if (url.pathname !== "/api/health-assist" || request.method !== "POST") {
       return Response.json({ error: "Not found" }, { status: 404, headers });
