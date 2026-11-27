@@ -5,6 +5,7 @@ import React, {
   useContext,
   useState,
   useEffect,
+  useRef,
   type ReactNode,
 } from "react";
 import { PI_NETWORK_CONFIG, BACKEND_URLS } from "@/lib/system-config";
@@ -80,6 +81,8 @@ export function PiAuthProvider({ children }: { children: ReactNode }) {
   const [piAccessToken, setPiAccessToken] = useState<string | null>(null);
   const [userData, setUserData] = useState<LoginDTO | null>(null);
 
+  const busy = useRef(false);
+
   const authenticateAndLogin = async (): Promise<void> => {
     setAuthMessage("Authenticating with Pi Network...");
     const piAuthResult = await authDeadline(window.Pi.authenticate(["username"], () => {}), "Pi authentication");
@@ -112,6 +115,8 @@ export function PiAuthProvider({ children }: { children: ReactNode }) {
   };
 
   const initializePiAndAuthenticate = async () => {
+    if (busy.current) return;
+    busy.current = true;
     setIsAuthenticated(false);
     setPiAccessToken(null);
     setUserData(null);
@@ -140,8 +145,10 @@ export function PiAuthProvider({ children }: { children: ReactNode }) {
     } catch (err) {
       console.error("Pi authentication failed");
       setAuthMessage(
-        previous => `${previous} Failed. Please retry.`
+        previous => { const message = err instanceof Error ? err.message : ""; const safe = /^(Pi verification HTTP [1-5][0-9]{2}|Pi authentication timed out|Pi SDK load timed out|Pi SDK init timed out|Invalid verified identity|Missing Pi access token)$/.test(message) ? message : "Check Pi SDK, app domain or network"; return `${previous} Failed. ${safe}. Please retry.`; }
       );
+    } finally {
+      busy.current = false;
     }
   };
 
