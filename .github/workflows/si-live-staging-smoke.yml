@@ -36,12 +36,12 @@ jobs:
             echo 'Health-domain hygiene keyword check failed'; exit 1
           fi
           echo 'AI HTTP, JSON answer and health-domain hygiene keyword check: PASS; broader semantic correctness, storage and Pi login remain unverified.' >> "$GITHUB_STEP_SUMMARY"
+          teacher_failed=0
           probe teacher -X POST -H "Origin: $origin" -H 'Content-Type: application/json' -d '{"grade":4,"subject":"Toán","question":"2 + 2 bằng bao nhiêu?","consent":true,"memoryConsent":false}' "$base/api/teacher"
-          if [ "$code" != 200 ]; then echo 'Teacher HTTP acceptance failed'; exit 1; fi
-          jq -e '(.answer // .response // "") | type == "string" and test("(^|[^0-9])4([^0-9]|$)")' /tmp/si-body >/dev/null
+          if [ "$code" != 200 ]; then echo 'Teacher HTTP acceptance failed'; teacher_failed=1; elif ! jq -e '(.answer // .response // "") | type == "string" and test("(^|[^0-9])4([^0-9]|$)")' /tmp/si-body >/dev/null; then echo 'Teacher answer check failed'; teacher_failed=1; fi
           probe rag -X POST -H "Origin: $origin" -H 'Content-Type: application/json' -d '{"query":"sức khỏe"}' "$base/api/knowledge/search"
-          if [ "$code" != 200 ]; then echo 'RAG endpoint acceptance failed'; exit 1; fi
-          jq -e '(.records | type == "array") and (.records | all(.approval_status == "approved" and (.source_url | startswith("https://"))))' /tmp/si-body >/dev/null
-          jq -r '"RAG returned records: " + (.records | length | tostring)' /tmp/si-body >> "$GITHUB_STEP_SUMMARY"
+          rag_failed=0
+          if [ "$code" != 200 ]; then echo 'RAG endpoint acceptance failed'; rag_failed=1; elif ! jq -e '(.records | type == "array") and (.records | all(.approval_status == "approved" and (.source_url | startswith("https://"))))' /tmp/si-body >/dev/null; then echo 'RAG schema/source check failed'; rag_failed=1; else jq -r '"RAG returned records: " + (.records | length | tostring)' /tmp/si-body >> "$GITHUB_STEP_SUMMARY"; fi
           probe memory_unauthenticated -X POST -H "Origin: $origin" -H 'Content-Type: application/json' -d '{"action":"read","consent":true}' "$base/api/memory"
           if [ "$code" != 401 ]; then echo 'Memory unauthorized access check failed'; exit 1; fi
+          if [ "$teacher_failed" != 0 ] || [ "$rag_failed" != 0 ]; then exit 1; fi
