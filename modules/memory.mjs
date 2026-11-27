@@ -1,5 +1,5 @@
-const allowed=["grade","subject","language"];
-const values={"grade":["1","2","3","4","5","6","7","8","9","10","11","12"],"subject":["math","language","science","history","other"],"language":["vi","en"]};
+const allowed=["grade","subject","language","answerStyle"];
+const values={"grade":["1","2","3","4","5","6","7","8","9","10","11","12"],"subject":["math","language","science","history","other"],"language":["vi","en"],"answerStyle":["simple","concise","detailed"]};
 export async function preferenceMemory(env,verifiedUid,input){
  if(!env.MEMORY_KV) throw Error("Memory unavailable");
  if(typeof verifiedUid!=="string"||!verifiedUid||verifiedUid.length>256) throw Error("Verified identity required");
