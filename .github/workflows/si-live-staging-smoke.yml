@@ -36,6 +36,6 @@ jobs:
             echo 'Health-domain hygiene keyword check failed'; exit 1
           fi
           echo 'AI HTTP, JSON answer and health-domain hygiene keyword check: PASS; broader semantic correctness, storage and Pi login remain unverified.' >> "$GITHUB_STEP_SUMMARY"
-          probe teacher -X POST -H "Origin: $origin" -H 'Content-Type: application/json' -d '{"grade":4,"subject":"math","question":"2 + 2 bằng bao nhiêu?","consent":true,"memoryConsent":false}' "$base/api/teacher"
+          probe teacher -X POST -H "Origin: $origin" -H 'Content-Type: application/json' -d '{"grade":4,"subject":"Toán","question":"2 + 2 bằng bao nhiêu?","consent":true,"memoryConsent":false}' "$base/api/teacher"
           if [ "$code" != 200 ]; then echo 'Teacher HTTP acceptance failed'; exit 1; fi
           jq -e '(.answer // .response // "") | type == "string" and test("(^|[^0-9])4([^0-9]|$)")' /tmp/si-body >/dev/null
