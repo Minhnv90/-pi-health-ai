@@ -1,0 +1,23 @@
+name = "pi-health-ai-staging"
+main = "worker.js"
+compatibility_date = "2026-11-21"
+
+[vars]
+STAGING_DIAGNOSTICS = "true"
+ALLOWED_ORIGINS = "https://minhnv90.github.io,https://healthcarebecbfa6251.pinet.com,https://health-si-frontend-staging.nguyenminh2290.workers.dev,https://healtheducations8222.pinet.com"
+AI_MODEL = "@cf/google/gemma-4-26b-a4b-it"
+
+[ai]
+binding = "AI"
+
+[[kv_namespaces]]
+binding = "MEMORY_KV"
+id = "629eb30b9af743fe9d433e348c42149b"
+
+[[d1_databases]]
+binding = "KNOWLEDGE_DB"
+database_name = "health-si-knowledge-staging"
+database_id = "54ea4dac-b6fd-4d21-a0fa-67c79d0d9693"
+
+[triggers]
+crons = ["0 */6 * * *"]

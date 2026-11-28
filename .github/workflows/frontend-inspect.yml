@@ -1,0 +1,23 @@
+name: Frontend deployment prerequisites
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Inspect frontend configuration
+        working-directory: frontend
+        run: |
+          test -f package.json
+          test -f pnpm-lock.yaml
+          test -f tsconfig.json
+          node -e 'const p=require("./package.json"); console.log(JSON.stringify({scripts:p.scripts,dependencies:p.dependencies,devDependencies:p.devDependencies},null,2))'
+          cat next.config.mjs
+          find app/api -type f

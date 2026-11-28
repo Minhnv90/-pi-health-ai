@@ -63,6 +63,7 @@
 <details class="card compact-fold" id="technicalFold"><summary>Đăng nhập Pi và thông tin ứng dụng</summary><section class="card"><h2>Đăng nhập Pi</h2><p class="muted">Kết nối tài khoản Pi để nhận diện người dùng. Bản thử nghiệm chưa thực hiện thanh toán.</p><div class="actions"><button id="piLogin">Đăng nhập bằng Pi</button><button class="secondary" id="piLogout">Xóa phiên hiển thị</button></div><div id="piStatus" class="status" role="status">Chưa kết nối.</div></section>
 <section class="card"><h2>Định hướng phát triển</h2><ul><li>Kết nối dữ liệu Apple Health / thiết bị đeo qua API có cấp quyền.</li><li>AI giải thích thông tin sức khỏe có trích dẫn nguồn y khoa.</li><li>Đồng bộ dữ liệu mã hóa và quản lý quyền truy cập.</li><li>Tích hợp thanh toán Pi chỉ sau khi có backend xác thực giao dịch.</li></ul><div class="notice">Không nhập thông tin định danh nhạy cảm hoặc hồ sơ bệnh án thật vào bản prototype này.</div></section></details>
 <footer>Bản thử nghiệm · Thông tin tham khảo, không chẩn đoán hay thay thế chăm sóc y tế.</footer>
+<details class="card compact-fold" id="teacherFold"><summary>Teacher AI – Lớp 1–12 (thử nghiệm)</summary><section class="card"><h2>Học cùng Teacher SI</h2><p class="muted">Dành cho học tập có người lớn hướng dẫn. Không nhập tên, trường, địa chỉ hoặc thông tin cá nhân.</p><form id="teacherForm"><div class="field"><label for="teacherGrade">Lớp</label><select id="teacherGrade"><option value="1">Lớp 1</option><option value="2">Lớp 2</option><option value="3">Lớp 3</option><option value="4">Lớp 4</option><option value="5">Lớp 5</option><option value="6">Lớp 6</option><option value="7">Lớp 7</option><option value="8">Lớp 8</option><option value="9">Lớp 9</option><option value="10">Lớp 10</option><option value="11">Lớp 11</option><option value="12">Lớp 12</option></select></div><div class="field"><label for="teacherSubject">Môn học</label><select id="teacherSubject"><option>Toán</option><option>Tiếng Việt</option><option>Ngữ văn</option><option>Tiếng Anh</option><option>Khoa học</option><option>Tự nhiên và Xã hội</option><option>Lịch sử</option><option>Địa lí</option><option>Vật lí</option><option>Hóa học</option><option>Sinh học</option><option>Tin học</option><option>Công nghệ</option><option>Giáo dục công dân</option><option>Giáo dục kinh tế và pháp luật</option><option>Âm nhạc</option><option>Mĩ thuật</option><option>Giáo dục thể chất</option><option>Hoạt động trải nghiệm</option><option>STEM</option><option>Kỹ năng sống</option></select></div><div class="field"><label for="teacherQuestion">Câu hỏi</label><textarea id="teacherQuestion" maxlength="2000" rows="3" required></textarea></div><label><input type="checkbox" id="teacherConsent" required> Tôi đồng ý gửi câu hỏi tới AI và có người lớn hướng dẫn nếu là trẻ em.</label><button id="teacherSend" type="submit">Hỏi Teacher</button></form><div id="teacherResult" class="result" role="status" aria-live="polite"></div></section></details>
 </main>
 <script>
 const $=id=>document.getElementById(id);let piUser=null;
@@ -161,4 +162,18 @@ function openHealthDeepLink(){
   if(anchor?.scrollIntoView)anchor.scrollIntoView({block:"start"});
 }
 if(typeof window.addEventListener==="function"){window.addEventListener("hashchange",openHealthDeepLink);openHealthDeepLink();}
+
+(function(){
+const form=document.getElementById("teacherForm"), result=document.getElementById("teacherResult"), send=document.getElementById("teacherSend"), consent=document.getElementById("teacherConsent");
+for(const id of ["teacherGrade","teacherSubject","teacherQuestion"]) document.getElementById(id).addEventListener("input",()=>{consent.checked=false;});
+form.addEventListener("submit",async event=>{
+ event.preventDefault(); if(send.disabled||!consent.checked)return;
+ const question=document.getElementById("teacherQuestion").value.trim();if(!question)return;
+ const payload={grade:Number(document.getElementById("teacherGrade").value),subject:document.getElementById("teacherSubject").value,question,consent:true};
+ consent.checked=false;send.disabled=true;result.textContent="Đang chờ Teacher...";
+ const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),30000);
+ try{const res=await fetch("https://pi-health-ai.nguyenminh2290.workers.dev/api/teacher",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload),signal:controller.signal});const data=await res.json();if(!res.ok||typeof data.answer!=="string")throw Error("API");result.textContent=data.answer+"\n\n"+(data.disclaimer||"");}
+ catch{result.textContent="Teacher chưa phản hồi. Vui lòng thử lại sau.";}finally{clearTimeout(timer);send.disabled=false;}
+});
+})();
 </script></body></html>
