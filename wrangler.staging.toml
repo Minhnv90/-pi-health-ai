@@ -4,7 +4,7 @@ compatibility_date = "2026-11-21"
 
 [vars]
 STAGING_DIAGNOSTICS = "true"
-ALLOWED_ORIGINS = "https://minhnv90.github.io,https://healthcarebecbfa6251.pinet.com,https://health-si-frontend-staging.nguyenminh2290.workers.dev"
+ALLOWED_ORIGINS = "https://minhnv90.github.io,https://healthcarebecbfa6251.pinet.com,https://health-si-frontend-staging.nguyenminh2290.workers.dev,https://healtheducations8222.pinet.com"
 AI_MODEL = "@cf/google/gemma-4-26b-a4b-it"
 
 [ai]
